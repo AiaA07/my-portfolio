@@ -1,0 +1,125 @@
+body{
+
+    /*Changes the font of the entire page*/
+    font-family: 'Times New Roman', Times, serif;
+
+ /*changes the thickness of the background of the whole page (behind the header, body, etc)*/
+    margin: 0rem;
+
+    /*changes the the tickness of the contents of the page (the higher the number, the smaller the conect becomes)*/
+    /*outside spacing*/
+    padding: 0rem;
+
+    /*Changes the color of the background of the body part of the page under the header*/
+    /*inside spacing*/
+    background: #ddd;
+
+    /*Changes the color of the text in body under the header*/
+    color: #333;
+}
+
+header{
+
+    /*changes the background color of the header*/
+    background: #333;
+
+    /*changes the color of the texts in h1 (and other hs like h2, h3, h4, etc) in the header*/
+    color: white;
+
+    /*changes the thickness of the header*/
+    padding: 1rem;
+
+    /*changes the alignment of the texts in the header to make them center, without it the texts are algined to the left*/
+    text-align: center;
+
+}
+
+nav a{
+
+    /*changes the color of the texts in the nav in the header (about, projects, and contact)*/
+    color: white;
+
+    /*space between the texts in the nav (about, projects, and contact*/
+    margin: 3rem;
+
+    /*lets you customize those texts to put lines under it, thorugh it, etc. Without it, the texts in nav is underlined.*/
+    text-decoration: none;
+
+}
+
+section{
+    padding: 2rem;
+
+    /*changes the background color of all the sections (about, my projects, contact*/
+    background: white;
+
+
+    /*changes the space between each sections (about me, my projects, and contact)*/
+    margin: 1rem;
+
+    /*changes the roundness of the border of each section (about me, my projects, and contact) */
+    border-radius: 8px;
+}
+
+footer{
+
+    /*aligns the texts in the footer to center*/
+    text-align: center;
+
+    /*makes your footer thicker*/
+    padding: 2rem;
+
+    /*changes the background color of the footer*/
+    background: #333;
+
+    /*changes the color of the texts in the footer*/
+    color: white;
+}
+
+
+
+.project {
+
+
+    /*changes the space between each project in 'My Projects'*/
+    margin-bottom: 2rem;
+    
+    /*changes the thickness of the border surrounding each project under 'My Projects' (higher number gives you more space inside the border which makes the text and video/image smaller)*/
+    padding: 1rem;
+
+    /*changes the background color of the inside of the border that is seprating each project in the projects section*/
+    background-color: white;
+
+    /*changes the thickness and color of the border*/
+    /*the 'solid' means the border is a solid continous line and not 'dotted' or 'double' lines*/
+    border: 20px solid black;
+
+    /*changes the roundness of the border*/
+    border-radius: 30px;
+  }
+
+
+  .image-row {
+
+    /*changes the align of the images in the FTP client software versions comparrisons section*/
+    /*'flex' = horizontal alignment*/
+    /*'block' = vertical alignment*/
+    display: block;
+
+    
+    justify-content: space-between;
+
+    
+    gap: 1rem; /* space between images */
+    flex-wrap: wrap; /* ensures they wrap on small screens */
+    margin-bottom: 1rem;
+  }
+  
+  .image-row img {
+    flex: 1;
+    max-width: 32%;
+    height: auto;
+    border-radius: 6px;
+    object-fit: contain;
+  }
+  
