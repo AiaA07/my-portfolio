@@ -1,125 +1,679 @@
-body{
+/* ============================================================
+   FONTS + RESET
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
 
-    /*Changes the font of the entire page*/
-    font-family: 'Times New Roman', Times, serif;
+*, *::before, *::after { box-sizing: border-box; }
 
- /*changes the thickness of the background of the whole page (behind the header, body, etc)*/
-    margin: 0rem;
-
-    /*changes the the tickness of the contents of the page (the higher the number, the smaller the conect becomes)*/
-    /*outside spacing*/
-    padding: 0rem;
-
-    /*Changes the color of the background of the body part of the page under the header*/
-    /*inside spacing*/
-    background: #ddd;
-
-    /*Changes the color of the text in body under the header*/
-    color: #333;
+:root {
+  --accent:   #7c6aff;
+  --accent-2: #ff6ab0;
+  --text:     #e2e2f0;
+  --muted:    #6a6a8c;
+  --border:   rgba(255,255,255,0.07);
+  --radius:   18px;
 }
 
-header{
-
-    /*changes the background color of the header*/
-    background: #333;
-
-    /*changes the color of the texts in h1 (and other hs like h2, h3, h4, etc) in the header*/
-    color: white;
-
-    /*changes the thickness of the header*/
-    padding: 1rem;
-
-    /*changes the alignment of the texts in the header to make them center, without it the texts are algined to the left*/
-    text-align: center;
-
+html, body {
+  height: 100%;
+  overflow: hidden;   /* single-screen — no page scroll */
 }
 
-nav a{
-
-    /*changes the color of the texts in the nav in the header (about, projects, and contact)*/
-    color: white;
-
-    /*space between the texts in the nav (about, projects, and contact*/
-    margin: 3rem;
-
-    /*lets you customize those texts to put lines under it, thorugh it, etc. Without it, the texts in nav is underlined.*/
-    text-decoration: none;
-
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0; padding: 0;
+  background: #04040e;
+  color: var(--text);
+  line-height: 1.75;
+  cursor: none;
 }
 
-section{
-    padding: 2rem;
-
-    /*changes the background color of all the sections (about, my projects, contact*/
-    background: white;
-
-
-    /*changes the space between each sections (about me, my projects, and contact)*/
-    margin: 1rem;
-
-    /*changes the roundness of the border of each section (about me, my projects, and contact) */
-    border-radius: 8px;
+/* ============================================================
+   THREE.JS FIXED BACKGROUND
+   ============================================================ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
 }
 
-footer{
-
-    /*aligns the texts in the footer to center*/
-    text-align: center;
-
-    /*makes your footer thicker*/
-    padding: 2rem;
-
-    /*changes the background color of the footer*/
-    background: #333;
-
-    /*changes the color of the texts in the footer*/
-    color: white;
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+#cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  pointer-events: none;
+  z-index: 9999;
+  transition: width .18s, height .18s, border-color .18s;
+  will-change: transform;
+}
+#cursor.cursor-big { width: 56px; height: 56px; border-color: var(--accent-2); }
+#cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
 }
 
+/* ============================================================
+   PAGE SHELL  (full-viewport flex column over the canvas)
+   ============================================================ */
+.page-shell {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
 
+/* ============================================================
+   SITE HEADER
+   ============================================================ */
+.site-header {
+  text-align: center;
+  padding: 2rem 1rem 0;
+  flex-shrink: 0;
+  animation: fadeDown 1s ease both;
+}
 
+.mission-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(124,106,255,.35);
+  border-radius: 999px;
+  padding: 0.3rem 1rem;
+  margin-bottom: 0.75rem;
+  background: rgba(124,106,255,.07);
+}
+
+.hero-name {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 6vw, 4rem);
+  margin: 0 0 0.25rem;
+  background: linear-gradient(130deg, #fff 20%, var(--accent) 55%, var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px rgba(124,106,255,.4));
+}
+
+.hero-tagline {
+  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+  color: var(--muted);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+@keyframes fadeDown {
+  from { opacity:0; transform:translateY(-18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ============================================================
+   PLANET NAVIGATION  (3 planets filling the centre space)
+   ============================================================ */
+.planet-nav {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 1rem 6%;
+}
+
+/* ── Planet button ── */
+.planet-btn {
+  all: unset;
+  cursor: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  transition: transform .4s cubic-bezier(.23,1,.32,1), filter .3s;
+  animation: fadeUp .9s ease both;
+}
+.planet-btn:nth-child(1) { animation-delay: .15s; transform: translateY(18px); }
+.planet-btn:nth-child(2) { animation-delay: .30s; transform: translateY(-14px); }
+.planet-btn:nth-child(3) { animation-delay: .45s; transform: translateY(10px); }
+
+/* keep the stagger offset on idle AND let hover override */
+.planet-btn:nth-child(1):hover { transform: translateY(18px)  scale(1.07); filter: brightness(1.25); }
+.planet-btn:nth-child(2):hover { transform: translateY(-14px) scale(1.07); filter: brightness(1.25); }
+.planet-btn:nth-child(3):hover { transform: translateY(10px)  scale(1.07); filter: brightness(1.25); }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(40px); }
+  to   { opacity:1; }   /* final Y set per nth-child above */
+}
+
+.planet-label {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(.85rem, 1.6vw, 1.1rem);
+  color: #fff;
+  letter-spacing: .03em;
+}
+
+.planet-hint {
+  font-size: .65rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .3s, transform .3s;
+}
+.planet-btn:hover .planet-hint { opacity: 1; transform: translateY(0); }
+
+/* ── Base planet sphere ── */
+.planet {
+  width:  clamp(150px, 20vw, 240px);
+  height: clamp(150px, 20vw, 240px);
+  border-radius: 50%;
+  position: relative;
+  overflow: visible;
+  animation: planetBob 7s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes planetBob {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+/* ── Earth ── */
+.earth-planet {
+  background:
+    radial-gradient(circle at 38% 30%, rgba(34,120,58,.9)  0%, transparent 30%),
+    radial-gradient(circle at 68% 62%, rgba(34,120,58,.75) 0%, transparent 22%),
+    radial-gradient(circle at 22% 68%, rgba(34,120,58,.5)  0%, transparent 18%),
+    radial-gradient(circle at 50% 50%, #1a3f8c 0%, #0d2460 55%, #060f2a 100%);
+  box-shadow:
+    0 0 0 2px rgba(100,180,255,.12),
+    0 0 45px rgba(30,100,255,.4),
+    0 0 90px rgba(30,100,255,.16),
+    inset -40px -20px 65px rgba(0,0,50,.8);
+}
+.earth-planet::before {
+  content:''; position:absolute; inset:4px; border-radius:50%;
+  background:
+    radial-gradient(ellipse at 18% 38%, rgba(255,255,255,.22) 0%, transparent 40%),
+    radial-gradient(ellipse at 72% 18%, rgba(255,255,255,.14) 0%, transparent 30%),
+    radial-gradient(ellipse at 55% 82%, rgba(255,255,255,.10) 0%, transparent 22%);
+  animation: cloudDrift 28s linear infinite;
+}
+.earth-planet::after {
+  content:''; position:absolute; inset:-10px; border-radius:50%;
+  box-shadow: 0 0 26px rgba(80,180,255,.3), inset 0 0 18px rgba(80,180,255,.04);
+}
+@keyframes cloudDrift { to { transform: rotate(360deg); } }
+
+/* ── Saturn ── */
+.saturn-planet {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #c46030 0px,  #d4784a 18px,
+      #b84e20 18px, #cc6838 36px,
+      #e0904c 36px, #d47040 54px,
+      #b84e20 54px, #c46030 72px
+    );
+  background-size: 100% 72px;
+  box-shadow:
+    0 0 50px rgba(220,130,60,.45),
+    0 0 100px rgba(220,130,60,.18),
+    inset -45px -22px 75px rgba(80,30,0,.8);
+  animation: planetBob 8s ease-in-out infinite, bandScroll 10s linear infinite;
+}
+@keyframes bandScroll {
+  from { background-position: 0 0; }
+  to   { background-position: 0 72px; }
+}
+.saturn-planet::after {
+  content:''; position:absolute; inset:-8px; border-radius:50%;
+  box-shadow: 0 0 28px rgba(220,150,60,.3);
+}
+
+/* Saturn / Neptune rings */
+.planet-ring {
+  position:absolute; top:50%; left:50%;
+  border-radius:50%; pointer-events:none;
+  transform: translate(-50%,-50%) perspective(500px) rotateX(76deg);
+}
+.r1 {
+  width:185%; height:33%;
+  border: 13px solid rgba(215,160,75,.4);
+  box-shadow: 0 0 14px rgba(215,160,75,.22);
+}
+.r2 {
+  width:228%; height:42%;
+  border: 5px solid rgba(215,160,75,.18);
+}
+
+/* ── Neptune ── */
+.neptune-planet {
+  background:
+    radial-gradient(circle at 38% 32%, rgba(80,200,255,.25)  0%, transparent 40%),
+    radial-gradient(circle at 62% 65%, rgba(40, 80,220,.35)  0%, transparent 32%),
+    radial-gradient(circle at 50% 50%, #1a4a94 0%, #0c2870 50%, #050f3a 100%);
+  box-shadow:
+    0 0 50px rgba(50,140,255,.42),
+    0 0 100px rgba(50,100,255,.18),
+    inset -42px -20px 72px rgba(0,10,70,.85);
+}
+.neptune-planet::before {
+  content:''; position:absolute; inset:5px; border-radius:50%;
+  background: repeating-linear-gradient(
+    -22deg, transparent 0px, transparent 10px,
+    rgba(120,210,255,.06) 10px, rgba(120,210,255,.06) 12px
+  );
+  animation: cloudDrift 40s linear infinite reverse;
+}
+.neptune-planet::after {
+  content:''; position:absolute; inset:-10px; border-radius:50%;
+  box-shadow: 0 0 32px rgba(80,180,255,.32), inset 0 0 18px rgba(80,180,255,.05);
+}
+.ice-ring {
+  width:205%; height:22%;
+  border:4px solid rgba(130,210,255,.3);
+  box-shadow: 0 0 10px rgba(130,210,255,.16);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer {
+  flex-shrink: 0;
+  padding: .6rem;
+  font-size: .72rem;
+  color: rgba(100,100,145,.55);
+  letter-spacing: .06em;
+}
+
+/* ============================================================
+   MODAL OVERLAY
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(2,2,14,.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayIn .25s ease both;
+}
+@keyframes overlayIn { from{opacity:0} to{opacity:1} }
+
+.modal-panel {
+  position: relative;
+  background: rgba(7,7,20,.92);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2.25rem 2rem;
+  width: min(760px, 92vw);
+  max-height: 82vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124,106,255,.35) transparent;
+  animation: panelIn .38s cubic-bezier(.23,1,.32,1) both;
+}
+.modal-panel::-webkit-scrollbar        { width: 5px; }
+.modal-panel::-webkit-scrollbar-track  { background: transparent; }
+.modal-panel::-webkit-scrollbar-thumb  { background: rgba(124,106,255,.35); border-radius:99px; }
+
+@keyframes panelIn {
+  from { opacity:0; transform:scale(.88) translateY(20px); }
+  to   { opacity:1; transform:scale(1)   translateY(0); }
+}
+
+.modal-close {
+  all: unset;
+  cursor: none;
+  position: absolute;
+  top: 1rem; right: 1.2rem;
+  font-size: 1rem;
+  color: var(--muted);
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  transition: color .2s, background .2s;
+}
+.modal-close:hover { color: #fff; background: rgba(255,255,255,.1); }
+
+/* ── Modal header row (mini planet + title) ── */
+.modal-body { display: flex; flex-direction: column; gap: 0; }
+
+.modal-planet-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-planet-row h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: #fff;
+  margin: 0;
+}
+
+/* Mini planets in modal header */
+.modal-mini {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+  overflow: visible;
+}
+.earth-mini {
+  background:
+    radial-gradient(circle at 38% 30%, rgba(34,120,58,.9) 0%, transparent 32%),
+    radial-gradient(circle at 50% 50%, #1a3f8c 0%, #06102a 100%);
+  box-shadow: 0 0 14px rgba(30,100,255,.5);
+}
+.saturn-mini {
+  background:
+    repeating-linear-gradient(to bottom, #c46030 0px, #d4784a 6px, #b84e20 12px);
+  box-shadow: 0 0 14px rgba(220,130,60,.5);
+}
+.neptune-mini {
+  background: radial-gradient(circle at 50% 50%, #1a4a94 0%, #050f3a 100%);
+  box-shadow: 0 0 14px rgba(50,140,255,.5);
+}
+
+/* mini rings on modal saturn */
+.mini-ring {
+  position:absolute; top:50%; left:50%;
+  border-radius:50%; pointer-events:none;
+  transform: translate(-50%,-50%) perspective(200px) rotateX(76deg);
+}
+.mr1 { width:175%; height:32%; border:3px solid rgba(215,160,75,.45); }
+.mr2 { width:215%; height:40%; border:2px solid rgba(215,160,75,.2); }
+.ice-mini-ring { width:195%; height:22%; border:2px solid rgba(130,210,255,.35); }
+
+/* ── Modal text ── */
+.modal-body > p {
+  color: rgba(200,200,220,.78);
+  font-size: .94rem;
+  margin: 0 0 .9rem;
+}
+.contact-line {
+  font-size: 1rem;
+  color: var(--text) !important;
+  margin-top: .5rem !important;
+}
+
+/* ============================================================
+   PROJECT CARDS (inside modal)
+   ============================================================ */
 .project {
+  background: rgba(10,10,28,.75);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform .5s cubic-bezier(.23,1,.32,1), box-shadow .4s, border-color .3s;
+  will-change: transform;
+}
+/* specular shine follows cursor */
+.project::before {
+  content:''; position:absolute; inset:0; border-radius:var(--radius);
+  background: radial-gradient(circle at var(--sx,50%) var(--sy,50%),
+    rgba(255,255,255,.06) 0%, transparent 60%);
+  opacity:0; transition:opacity .3s;
+  pointer-events:none; z-index:0;
+}
+.project:hover::before { opacity:1; }
+/* colour bar per card */
+.project::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .4s ease; z-index:1;
+}
+.project:hover::after    { transform:scaleX(1); }
+.project:hover {
+  box-shadow: 0 20px 50px rgba(0,0,0,.6), 0 0 0 1px rgba(124,106,255,.18);
+  border-color: rgba(124,106,255,.2);
+}
+.project:nth-child(2)::after { background:linear-gradient(90deg,#22c55e,#0ea5e9); }
+.project:nth-child(3)::after { background:linear-gradient(90deg,#3b82f6,#06b6d4); }
+.project:nth-child(4)::after { background:linear-gradient(90deg,#a855f7,#ec4899); }
+.project:nth-child(5)::after { background:linear-gradient(90deg,#ef4444,#f97316); }
+.project:nth-child(6)::after { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
 
+.project > * { position:relative; z-index:1; }
+.project h3  { font-size:1.1rem; font-weight:600; color:#fff; margin:0 0 .9rem; }
+.project p   { font-size:.9rem;  color:rgba(180,180,210,.75); margin:.8rem 0; }
 
-    /*changes the space between each project in 'My Projects'*/
-    margin-bottom: 2rem;
-    
-    /*changes the thickness of the border surrounding each project under 'My Projects' (higher number gives you more space inside the border which makes the text and video/image smaller)*/
-    padding: 1rem;
+.project video {
+  width:100%; max-width:460px; border-radius:9px;
+  display:block; margin:.5rem 0;
+  border:1px solid var(--border);
+}
+.project a[href*="github"] {
+  display:inline-flex; align-items:center; gap:.4rem;
+  color:var(--accent); text-decoration:none;
+  font-size:.85rem; font-weight:500;
+  border:1px solid rgba(124,106,255,.35);
+  padding:.35rem 1rem; border-radius:999px;
+  transition:background .22s, color .22s, box-shadow .22s, transform .2s;
+}
+.project a[href*="github"]:hover {
+  background:var(--accent); color:#fff;
+  box-shadow:0 6px 18px rgba(124,106,255,.4);
+  transform:translateY(-1px);
+}
 
-    /*changes the background color of the inside of the border that is seprating each project in the projects section*/
-    background-color: white;
+/* image row (FTP project) */
+.image-row { display:flex; gap:.7rem; flex-wrap:wrap; margin-bottom:.8rem; }
+.image-row img {
+  flex:1; min-width:130px; max-width:32%; height:auto;
+  border-radius:7px; object-fit:contain;
+  border:1px solid var(--border);
+  transition:transform .3s, box-shadow .3s;
+}
+.image-row img:hover { transform:scale(1.06) translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.6); }
 
-    /*changes the thickness and color of the border*/
-    /*the 'solid' means the border is a solid continous line and not 'dotted' or 'double' lines*/
-    border: 20px solid black;
+/* ============================================================
+   CONTACT FORM
+   ============================================================ */
+.contact-direct {
+  font-size: .88rem;
+  color: var(--muted);
+  margin: 0 0 1.5rem;
+}
+.contact-direct a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(124,106,255,.35);
+  transition: border-color .2s, color .2s;
+}
+.contact-direct a:hover { color: #fff; border-color: #fff; }
 
-    /*changes the roundness of the border*/
-    border-radius: 30px;
-  }
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
 
-  .image-row {
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
 
-    /*changes the align of the images in the FTP client software versions comparrisons section*/
-    /*'flex' = horizontal alignment*/
-    /*'block' = vertical alignment*/
-    display: block;
+.form-group label {
+  font-size: .75rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 
-    
-    justify-content: space-between;
+.form-group input,
+.form-group textarea {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .65rem .9rem;
+  font-family: 'Inter', sans-serif;
+  font-size: .92rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+  resize: vertical;
+  cursor: text;
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: rgba(120,120,160,.6); }
 
-    
-    gap: 1rem; /* space between images */
-    flex-wrap: wrap; /* ensures they wrap on small screens */
-    margin-bottom: 1rem;
-  }
-  
-  .image-row img {
-    flex: 1;
-    max-width: 32%;
-    height: auto;
-    border-radius: 6px;
-    object-fit: contain;
-  }
-  
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: rgba(124,106,255,.6);
+  background: rgba(124,106,255,.05);
+  box-shadow: 0 0 0 3px rgba(124,106,255,.12);
+}
+
+/* error state */
+.form-group.has-error input,
+.form-group.has-error textarea {
+  border-color: rgba(255,80,80,.55);
+  background: rgba(255,60,60,.04);
+}
+.field-error {
+  font-size: .74rem;
+  color: #f87171;
+  margin-top: .1rem;
+}
+.form-send-error {
+  font-size: .84rem;
+  color: #f87171;
+  margin: 0;
+  text-align: center;
+}
+
+/* send button */
+.send-btn {
+  all: unset;
+  cursor: none;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 600;
+  padding: .7rem 1.8rem;
+  border-radius: 999px;
+  transition: opacity .2s, transform .2s, box-shadow .2s;
+  box-shadow: 0 4px 20px rgba(124,106,255,.35);
+}
+.send-btn:hover:not(:disabled) {
+  opacity: .88;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(124,106,255,.5);
+}
+.send-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* spinner inside button */
+.btn-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* success state */
+.contact-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0 1rem;
+  text-align: center;
+}
+.success-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #0ea5e9);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  color: #fff;
+  box-shadow: 0 0 32px rgba(34,197,94,.4);
+  animation: popIn .45s cubic-bezier(.23,1,.32,1) both;
+}
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.success-title { color: var(--text);   font-size: 1.05rem; font-weight: 600; margin: 0; }
+.success-sub   { color: var(--muted);  font-size: .88rem;  margin: .2rem 0; text-align: center; }
+.success-sub a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(124,106,255,.35); }
+.success-sub a:hover { color: #fff; }
+.success-sub strong { color: var(--text); }
+.mail-icon { background: linear-gradient(135deg, var(--accent), #06b6d4) !important; }
+
+.retry-btn {
+  all: unset;
+  cursor: none;
+  color: var(--muted);
+  font-size: .82rem;
+  border-bottom: 1px solid rgba(120,120,160,.35);
+  transition: color .2s;
+}
+.retry-btn:hover { color: var(--text); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 520px) {
+  .form-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  html, body { overflow: hidden; }
+  .planet-nav { flex-direction: column; gap: 1.5rem; padding: .5rem 4%; justify-content: center; }
+  .planet { width: 130px; height: 130px; }
+  .planet-btn:nth-child(1),
+  .planet-btn:nth-child(2),
+  .planet-btn:nth-child(3) { transform: none; }
+  .planet-btn:nth-child(1):hover,
+  .planet-btn:nth-child(2):hover,
+  .planet-btn:nth-child(3):hover { transform: scale(1.06); }
+  .hero-name { font-size: clamp(1.6rem, 8vw, 2.4rem); }
+  body { cursor: auto; }
+  #cursor, #cursor-dot { display: none; }
+}
