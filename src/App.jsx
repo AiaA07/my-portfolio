@@ -128,7 +128,7 @@ function ProjectsContent() {
           <source src="/videos/SleepApp.mp4" type="video/mp4" />
         </video>
         <p>Is currently a part of team of 3 to develop a sleep analysis on Xcode using Swift. We have integrated motion sensors, microphone, and snore detection. We are currently working on smartwatch integration to include the heart rate sensor.</p>
-        <a href="https://github.com/alberico007/smarterpillow" target="_blank" rel="noreferrer">View on GitHub</a>
+        <a href="https://github.com/alberico007/slumberscope" target="_blank" rel="noreferrer">View on GitHub</a>
       </div>
 
       <div className="project">
